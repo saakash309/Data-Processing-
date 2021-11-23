@@ -1,6 +1,4 @@
 from tkinter import *
-import tkinter
-from types import FrameType
 from database import *
 import config
 from tkinter import messagebox,Canvas,ttk
@@ -14,7 +12,6 @@ try:
     keys = ob.fields()
 except IndexError:
     messagebox.showerror('File absent','No config file found')
-print(keys)
 try:
     original_clms= data_columns(keys,fname)
     clms = data_columns(keys,fname)
@@ -39,8 +36,8 @@ def save():
                 messagebox.showerror('Fields empty','Fields cannot be left empty')
                 return 
     for _ in range(len(box_names)):
-        print(value(box_names[_]))
-        print(attr_type(value(box_names[_])))
+        # print(value(box_names[_]))
+        # print(attr_type(value(box_names[_])))
         if attr_type(value(box_names[_]))==temp_list[_]:
             line += value(box_names[_]) + ";"
             response = 'yes'
@@ -133,12 +130,20 @@ frame1 = Frame(root)
 frame1.pack()
 tree = tree_view_frame(keys,clms,frame1)
 #entry table
-insert_frame = LabelFrame(root)
+insert_frame = Frame(root)
 #insert_frame.grid(row=11,column=0,sticky='nsew')
-insert_frame.pack(fill='both')
+insert_frame.pack(fill=BOTH,expand=1)
+mycanvas = Canvas(insert_frame)
+mycanvas.pack(side=LEFT,fill=BOTH,expand=1)
+myscrollbar = Scrollbar(insert_frame,orient=VERTICAL,command=mycanvas.yview)
+myscrollbar.pack(side=RIGHT,fill=Y)
+mycanvas.configure(yscrollcommand=myscrollbar.set)
+mycanvas.bind('<Configure>',lambda e: mycanvas.configure(scrollregion=mycanvas.bbox("all")))
 
-frame2 = Listbox(insert_frame)
-frame2.pack()
+frame2= Frame(mycanvas)
+mycanvas.create_window((0,0),window=frame2,anchor='nw')
+# frame2 = Listbox(insert_frame)
+# frame2.pack()
 i,box_names=1,[]
 #search box
 
@@ -167,7 +172,7 @@ search_frame.pack()
 
 my_tree = tree_view_frame(keys,[],search_frame)
 
-root.title('GUI')
+root.title('Data Processing')
 root.geometry('1250x1250')
 root.configure(background="#ffffff")
 
